@@ -1,0 +1,29 @@
+digraph Automaton {
+ rankdir=LR; node [shape=circle];
+ start [shape=point];
+ "k1" [shape=circle];
+ "k2" [shape=circle];
+ "k3" [shape=circle];
+ "k4" [shape=doublecircle];
+ "k5" [shape=doublecircle];
+ "kTrap" [shape=circle];
+ start -> "k1";
+ "k1" -> "k2" [label="a"];
+ "k1" -> "k3" [label="b"];
+ "k1" -> "kTrap" [label="c"];
+ "k2" -> "kTrap" [label="a"];
+ "k2" -> "k2" [label="b"];
+ "k2" -> "k4" [label="c"];
+ "k3" -> "k5" [label="a"];
+ "k3" -> "kTrap" [label="b"];
+ "k3" -> "k3" [label="c"];
+ "k4" -> "k4" [label="a"];
+ "k4" -> "kTrap" [label="b"];
+ "k4" -> "kTrap" [label="c"];
+ "k5" -> "kTrap" [label="a"];
+ "k5" -> "k5" [label="b"];
+ "k5" -> "kTrap" [label="c"];
+ "kTrap" -> "kTrap" [label="a"];
+ "kTrap" -> "kTrap" [label="b"];
+ "kTrap" -> "kTrap" [label="c"];
+}
