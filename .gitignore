@@ -1,8 +1,5 @@
-build/
-build_*/
+rgr
+rgr.exe
+*.o
 .idea/
 .vscode/
-*.o
-*.obj
-*.exe
-.DS_Store
