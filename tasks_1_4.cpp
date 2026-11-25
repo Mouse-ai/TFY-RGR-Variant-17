@@ -2,6 +2,8 @@
 #include <iostream>
 #include <set>
 #include <string>
+#include <vector>
+#include <utility>
 using namespace std;
 
 // Язык — множество строк. set автоматически убирает повторы.
@@ -92,11 +94,36 @@ void replaceSymbol(string& word, char oldSymbol, const string& replacement) {
     if (position != string::npos) word.replace(position, 1, replacement);
 }
 
+// Проверяем форму правил, а не печатаем готовый тип.
+// Для нашего варианта достаточно различать типы 2 и 3.
+int grammarType(const vector<pair<char, string>>& rules) {
+    bool contextFree = true;
+    bool rightLinear = true;
+    for (const auto& rule : rules) {
+        char left = rule.first;
+        const string& right = rule.second;
+        if (left < 'A' || left > 'Z') contextFree = false;
+        bool form1 = right.size() == 1 &&
+                     right[0] >= 'a' && right[0] <= 'z';
+        bool form2 = right.size() == 2 &&
+                     right[0] >= 'a' && right[0] <= 'z' &&
+                     right[1] >= 'A' && right[1] <= 'Z';
+        if (!right.empty() && !form1 && !form2)
+            rightLinear = false;
+    }
+    if (contextFree && rightLinear) return 3;
+    if (contextFree) return 2;
+    return 0; // Упрощённая проверка: типы 0 и 1 отдельно не различаем.
+}
+
 // Задание 3: S->aAa, A->aBa|a, B->A.
 void task3() {
     cout << "Грамматика: S->aAa, A->aBa|a, B->A\n";
-    cout << "Тип 2 (контекстно-свободная): слева ровно один нетерминал.\n";
-    cout << "L(G) = {a^(2n+3), n>=0}\n";
+    vector<pair<char, string>> rules = {
+        {'S', "aAa"}, {'A', "aBa"}, {'B', "A"}, {'A', "a"}
+    };
+    cout << "Вычисленный тип грамматики: " << grammarType(rules) << "\n";
+    cout << "Сгенерированные по правилам цепочки (n=0..3):\n";
     for (int n = 0; n < 4; n++) {
         string word = "S";
         cout << "n=" << n << ": " << word;
@@ -136,7 +163,11 @@ void task4() {
     cout << "Грамматика для a^k b^l c^m b^l a^k, k,l,m>=1:\n";
     cout << "S -> aSa | aAa\nA -> bAb | bBb\n";
     cout << "B -> cC\nC -> cC | lambda\n";
-    cout << "Тип 2: в левых частях продукций один нетерминал.\n";
+    vector<pair<char, string>> rules = {
+        {'S', "aSa"}, {'S', "aAa"}, {'A', "bAb"},
+        {'A', "bBb"}, {'B', "cC"}, {'C', "cC"}, {'C', ""}
+    };
+    cout << "Вычисленный тип грамматики: " << grammarType(rules) << "\n";
     showTask4Derivation(1, 1, 1);
     showTask4Derivation(2, 2, 3);
 }

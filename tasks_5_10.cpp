@@ -238,19 +238,45 @@ void task10() {
         {'S',"a"}, {'S',"aS"}, {'S',"aA"},
         {'A',"a"}, {'A',"b"}, {'A',"c"}
     };
-    NFA n;
-    n.count = 3; n.alphabet = "abc"; n.finals = {3};
-    // S = k1, A = k2, конечное состояние = k3.
+    // Нумеруем нетерминалы из самих правил, не вручную.
+    map<char, int> numbers;
+    numbers['S'] = 1;
     for (const auto& rule : rules) {
-        int from = (rule.first == 'S') ? 1 : 2;
+        if (!numbers.count(rule.first))
+            numbers[rule.first] = (int)numbers.size() + 1;
+        if (rule.second.size() == 2) {
+            char target = rule.second[1];
+            if (!numbers.count(target))
+                numbers[target] = (int)numbers.size() + 1;
+        }
+    }
+    NFA n;
+    n.alphabet = "abc";
+    n.count = (int)numbers.size() + 1;
+    n.finals = {n.count}; // Дополнительное конечное состояние.
+    cout << "Состояния нетерминалов: ";
+    for (const auto& entry : numbers)
+        cout << entry.first << "=k" << entry.second << " ";
+    cout << "конечное=k" << n.count << "\n";
+    for (const auto& rule : rules) {
+        int from = numbers[rule.first];
         char letter = rule.second[0];
-        int to = 3;
+        int to = n.count;
         if (rule.second.size() == 2)
-            to = (rule.second[1] == 'S') ? 1 : 2;
+            to = numbers[rule.second[1]];
         n.moves[{from, letter}].insert(to);
         cout << rule.first << " -> " << rule.second << "\n";
     }
     printNFA(n);
-    cout << "Язык: {a^n, a^nb, a^nc | n>=1}\n";
-    cout << "aab: " << (checkNFA(n, "aab") ? "принято" : "отклонено") << "\n";
+    cout << "Принятые цепочки длиной до 4 (вычислены автоматом):\n";
+    vector<string> current = {""};
+    for (int length = 0; length <= 4; length++) {
+        vector<string> next;
+        for (const string& word : current) {
+            if (checkNFA(n, word)) cout << word << " ";
+            for (char c : n.alphabet) next.push_back(word + c);
+        }
+        current = next;
+    }
+    cout << "\n";
 }
